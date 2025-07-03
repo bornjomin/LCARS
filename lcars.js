@@ -14,12 +14,12 @@ function topFunction() {
 }
 
 
-    const CLIENT_ID = '864033286840-qjpbbdnj3ujilcfc6dfl3qpu553caldr.apps.googleusercontent.com'; // ✅ Replace
-    const API_KEY = 'AIzaSyCs6niQggMQJSQJC1RxyLiHFEnCu4W-BpQ'; // ✅ Replace
+    const CLIENT_ID = '864033286840-qjpbbdnj3ujilcfc6dfl3qpu553caldr.apps.googleusercontent.com'; // Replace with your actual client ID
+    const API_KEY = 'AIzaSyCs6niQggMQJSQJC1RxyLiHFEnCu4W-BpQ'; // Replace with your actual API key
     const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
     const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
     const SHEET_ID = '1cq8a8QDSOBE4B0JpwqGLRHkL3PiNGNcGxnNHdvFAryU';
-    const RANGE = 'Sheet1!B2';
+    const COURAGE_RANGE = 'Sheet1!B2';
 
     let tokenClient;
     let gapiInited = false;
@@ -46,7 +46,7 @@ function topFunction() {
       tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
         scope: SCOPES,
-        callback: '', // Set later
+        callback: '', // Set later during request
       });
 
       gisInited = true;
@@ -89,7 +89,7 @@ function topFunction() {
       try {
         const getResp = await gapi.client.sheets.spreadsheets.values.get({
           spreadsheetId: SHEET_ID,
-          range: RANGE,
+          range: COURAGE_RANGE,
         });
 
         const currentValue = parseInt(getResp.result.values?.[0]?.[0] ?? '1', 10);
@@ -103,7 +103,7 @@ function topFunction() {
 
         await gapi.client.sheets.spreadsheets.values.update({
           spreadsheetId: SHEET_ID,
-          range: RANGE,
+          range: COURAGE_RANGE,
           valueInputOption: 'USER_ENTERED',
           resource: { values: [[newValue]] },
         });
@@ -125,26 +125,42 @@ function topFunction() {
       try {
         const response = await gapi.client.sheets.spreadsheets.values.get({
           spreadsheetId: SHEET_ID,
-          range: 'Sheet1!B2:B6'
+          range: 'Sheet1!A2:B6'
         });
 
-        const values = response.result.values;
-        console.log("Fetched values:", values); // Helps debug content
+        console.log("✅ Google Sheets API response:", response);
 
-        const courageValue = values?.[0]?.[0] ?? '—';
-        const renownValue = values?.[1]?.[0] ?? '—';
-        const woundsValue = values?.[2]?.[0] ?? '—';
-        const experienceValue = values?.[3]?.[0] ?? '—';
-        const aggressionValue = values?.[4]?.[0] ?? '—';
+        const rows = response.result.values;
+        if (!rows || !Array.isArray(rows)) {
+          throw new Error("No data returned from sheet.");
+        }
 
-        document.getElementById("sheetValue").innerText = courageValue;
-        document.getElementById("renownValue").innerText = renownValue;
-        document.getElementById("woundsValue").innerText = woundsValue;
-        document.getElementById("experienceValue").innerText = experienceValue;
-        document.getElementById("aggressionValue").innerText = aggressionValue;
+        const valueMap = {};
+        rows.forEach(row => {
+          const key = row[0];
+          const val = row[1];
+          valueMap[key] = val;
+        });
+
+        console.log("✅ Parsed valueMap:", valueMap);
+
+        const updateText = (id, value) => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.textContent = value ?? '—';
+          } else {
+            console.warn(`⚠️ Element with id "${id}" not found`);
+          }
+        };
+
+        updateText("sheetValue", valueMap["Courage"]);
+        updateText("renownValue", valueMap["Renown"]);
+        updateText("woundsValue", valueMap["Wounds"]);
+        updateText("experienceValue", valueMap["Experience"]);
+        updateText("aggressionValue", valueMap["Aggression"]);
 
       } catch (error) {
-        console.error("Error fetching sheet data:", error);
+        console.error("❌ Error fetching sheet data:", error);
         document.getElementById("sheetValue").innerText = "Error";
         document.getElementById("renownValue").innerText = "Error";
         document.getElementById("woundsValue").innerText = "Error";
