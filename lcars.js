@@ -196,19 +196,22 @@ async function loadSheetData() {
 // Expose to HTML inline onclick handlers
 window.changeValue = changeValue;
 
-//Handle changing views on index.html
+//Toggle between main and attributes views
 document.addEventListener("DOMContentLoaded", function() {
-      const pages = document.querySelectorAll(".page-container");
-      const links = document.querySelectorAll(".nav-link");
+			const attrLink = document.getElementById("load-attributes");
+			const attrContent = document.getElementById("attributes-content");
+			const mainWrapper = document.querySelector(".wrap-everything");
 
-      links.forEach(link => {
-        link.addEventListener("click", function(e) {
-          e.preventDefault();
-          const target = this.getAttribute("data-target");
-          if (!target) return;
+			if (attrLink && attrContent && mainWrapper) {
+				attrLink.addEventListener("click", function(e) {
+					e.preventDefault();
+					mainWrapper.style.display = "none";
+					attrContent.style.display = "block";
+				});
+			}
+		});
 
-          pages.forEach(p => p.style.display = (p.id === 'page-' + target) ? 'block' : 'none');
-          window.scrollTo(0,0);
-        });
-      });
-    });
+		function restoreMain() {
+			document.querySelector(".wrap-everything").style.display = "block";
+			document.getElementById("attributes-content").style.display = "none";
+		}
