@@ -85,29 +85,30 @@
     };
 
     function maybeEnableButtons() {
-      if (gapiInited && gisInited && domReady) {
-        const statusEl = document.getElementById("status");
-        if (statusEl) {
-          statusEl.textContent = "Ready!";
-        }
-        document.querySelectorAll('nav a').forEach(btn => btn.removeAttribute('disabled'));
-      }
+  if (gapiInited && gisInited && domReady) {
+    const statusEl = document.getElementById("status");
+    if (statusEl) {
+      statusEl.textContent = "Ready!";
     }
 
-    function changeValue(action) {
-      if (gapi.client.getToken()) {
-        runUpdate(action);
-      } else {
-        tokenClient.callback = (resp) => {
-          if (resp.error) {
-            document.getElementById("status").textContent = "Authentication failed.";
-            return;
-          }
-          runUpdate(action);
-        };
-        tokenClient.requestAccessToken({ prompt: '' });
-      }
+    document.querySelectorAll('nav a').forEach(btn => btn.removeAttribute('disabled'));
+
+    // Only load data once (first time everything is ready)
+    if (!gapi.client.getToken()) {
+      tokenClient.callback = (resp) => {
+        if (resp.error) {
+          console.error("❌ Token error:", resp);
+          document.getElementById("status").textContent = "Authentication failed.";
+          return;
+        }
+        loadSheetData(); // <-- ✅ This will run only once after successful auth
+      };
+      tokenClient.requestAccessToken({ prompt: '' });
+    } else {
+      loadSheetData(); // already signed in
     }
+  }
+}
 
     async function runUpdate(action) {
       try {
