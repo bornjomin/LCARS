@@ -198,12 +198,45 @@ window.changeValue = changeValue;
 
 //Toggle between main and attributes views
 // Intercept click on "Attributes" link
-	document.getElementById('attributes-link').addEventListener('click', function(event) {
-		event.preventDefault(); // Prevent navigation
-
+//	document.getElementById('attributes-link').addEventListener('click', function(event) {
+//		event.preventDefault(); // Prevent navigation
+//
 		// Hide main content
-		document.getElementById('main-content').style.display = 'none';
+//		document.getElementById('main-content').style.display = 'none';
 
 		// Show Attributes content
-		document.getElementById('attributes-content').style.display = 'block';
+//		document.getElementById('attributes-content').style.display = 'block';
+	//});
+
+//New toggle for additional pages:
+// List of all dynamic sections you want to toggle
+	const sections = ['main-content', 'attributes-content', 'status-content', 'mission-content', 'skills-content'];
+
+	// Helper function to show one section and hide the others
+	function showSection(sectionId) {
+		sections.forEach(id => {
+			const el = document.getElementById(id);
+			if (el) el.style.display = (id === sectionId) ? 'block' : 'none';
+		});
+	}
+
+	// Attach event listeners for each link
+	document.getElementById('attributes-link').addEventListener('click', function(event) {
+		event.preventDefault();
+		showSection('attributes-content');
+	});
+
+	document.getElementById('status-link').addEventListener('click', function(event) {
+		event.preventDefault();
+		showSection('status-content');
+	});
+
+	document.getElementById('mission-link').addEventListener('click', function(event) {
+		event.preventDefault();
+		showSection('mission-content');
+	});
+
+	document.getElementById('skills-link').addEventListener('click', function(event) {
+		event.preventDefault();
+		showSection('skills-content');
 	});
