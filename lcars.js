@@ -21,10 +21,10 @@ function topFunction() {
     const SHEET_ID = '1cq8a8QDSOBE4B0JpwqGLRHkL3PiNGNcGxnNHdvFAryU';
     const RANGE = 'Sheet1!B2';
 
-    let domReady = false;
     let tokenClient;
     let gapiInited = false;
     let gisInited = false;
+    let domReady = false;
 
     function onGapiLoad() {
       gapi.load('client', initializeGapiClient);
@@ -38,7 +38,8 @@ function topFunction() {
       gapiInited = true;
       maybeEnableButtons();
     }
- window.onload = () => {
+
+    window.onload = () => {
       domReady = true;
       maybeEnableButtons();
 
@@ -116,6 +117,11 @@ function topFunction() {
     }
 
     async function loadSheetData() {
+      if (!domReady) {
+        setTimeout(loadSheetData, 100);
+        return;
+      }
+
       try {
         const response = await gapi.client.sheets.spreadsheets.values.get({
           spreadsheetId: SHEET_ID,
@@ -123,12 +129,13 @@ function topFunction() {
         });
 
         const values = response.result.values;
+        console.log("Fetched values:", values); // Helps debug content
 
-        const courageValue = values[0]?.[0] ?? '';
-        const renownValue = values[1]?.[0] ?? '';
-        const woundsValue = values[2]?.[0] ?? '';
-        const experienceValue = values[3]?.[0] ?? '';
-        const aggressionValue = values[4]?.[0] ?? '';
+        const courageValue = values?.[0]?.[0] ?? '—';
+        const renownValue = values?.[1]?.[0] ?? '—';
+        const woundsValue = values?.[2]?.[0] ?? '—';
+        const experienceValue = values?.[3]?.[0] ?? '—';
+        const aggressionValue = values?.[4]?.[0] ?? '—';
 
         document.getElementById("sheetValue").innerText = courageValue;
         document.getElementById("renownValue").innerText = renownValue;
@@ -145,4 +152,3 @@ function topFunction() {
         document.getElementById("aggressionValue").innerText = "Error";
       }
     }
-    
