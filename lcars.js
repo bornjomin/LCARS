@@ -21,6 +21,7 @@ function topFunction() {
     const SHEET_ID = '1cq8a8QDSOBE4B0JpwqGLRHkL3PiNGNcGxnNHdvFAryU';
     const RANGE = 'Sheet1!B2';
 
+    let domReady = false;
     let tokenClient;
     let gapiInited = false;
     let gisInited = false;
@@ -37,8 +38,10 @@ function topFunction() {
       gapiInited = true;
       maybeEnableButtons();
     }
+ window.onload = () => {
+      domReady = true;
+      maybeEnableButtons();
 
-    window.onload = () => {
       tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
         scope: SCOPES,
@@ -48,7 +51,6 @@ function topFunction() {
       gisInited = true;
       maybeEnableButtons();
 
-      // Attempt silent login
       tokenClient.requestAccessToken({
         prompt: '',
         callback: () => {
@@ -58,9 +60,12 @@ function topFunction() {
     };
 
     function maybeEnableButtons() {
-      if (gapiInited && gisInited) {
+      if (gapiInited && gisInited && domReady) {
+        const statusEl = document.getElementById("status");
+        if (statusEl) {
+          statusEl.textContent = "Ready!";
+        }
         document.querySelectorAll('nav a').forEach(btn => btn.removeAttribute('disabled'));
-        document.getElementById("status").textContent = "Ready!";
       }
     }
 
@@ -103,9 +108,7 @@ function topFunction() {
         });
 
         document.getElementById("status").textContent = `Cell B2 updated to ${newValue}`;
-
-        // Reload sheet data after update
-        loadSheetData();
+        loadSheetData(); // Refresh values after update
       } catch (err) {
         console.error("Error updating sheet:", err);
         document.getElementById("status").textContent = "Failed to update.";
@@ -120,11 +123,6 @@ function topFunction() {
         });
 
         const values = response.result.values;
-
-        if (!values || values.length === 0) {
-          console.warn("No data found.");
-          return;
-        }
 
         const courageValue = values[0]?.[0] ?? '';
         const renownValue = values[1]?.[0] ?? '';
@@ -147,3 +145,7 @@ function topFunction() {
         document.getElementById("aggressionValue").innerText = "Error";
       }
     }
+  </script>
+</body>
+</html>
+    
