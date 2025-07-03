@@ -53,7 +53,7 @@ function topFunction() {
     function initApi() {
       gapi.load('client:auth2', () => {
         gapi.auth2.init({
-          client_id: 'YOUR_CLIENT_ID.apps.googleusercontent.com' // Replace with your client ID
+          client_id: '864033286840-qjpbbdnj3ujilcfc6dfl3qpu553caldr.apps.googleusercontent.com ' // Replace with your client ID
         }).then(() => {
           gapiLoaded = true;
           if (isAuthenticated) {
@@ -132,8 +132,8 @@ function topFunction() {
     // Load the Google API client
     gapi.load("client", () => {
       gapi.client.init({
-        apiKey: 'YOUR_API_KEY', // Add your API Key here
-        clientId: 'YOUR_CLIENT_ID.apps.googleusercontent.com', // Add your client ID
+        apiKey: 'AIzaSyCs6niQggMQJSQJC1RxyLiHFEnCu4W-BpQY', // Add your API Key here
+        clientId: '864033286840-qjpbbdnj3ujilcfc6dfl3qpu553caldr.apps.googleusercontent.com ', // Add your client ID
         discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
         scope: 'https://www.googleapis.com/auth/spreadsheets',
       }).then(() => {
