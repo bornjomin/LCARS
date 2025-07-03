@@ -38,12 +38,12 @@
   <script src="https://apis.google.com/js/api.js" async defer onload="onGapiLoad()"></script>
 
   <script>
-    const CLIENT_ID = '864033286840-qjpbbdnj3ujilcfc6dfl3qpu553caldr.apps.googleusercontent.com'; // ✅ Replace with your actual client ID
-    const API_KEY = 'AIzaSyCs6niQggMQJSQJC1RxyLiHFEnCu4W-BpQ'; // ✅ Replace with your actual API key
+    const CLIENT_ID = '864033286840-qjpbbdnj3ujilcfc6dfl3qpu553caldr.apps.googleusercontent.com'; // Replace with your actual client ID
+    const API_KEY = 'AIzaSyCs6niQggMQJSQJC1RxyLiHFEnCu4W-BpQ'; // Replace with your actual API key
     const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
     const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
     const SHEET_ID = '1cq8a8QDSOBE4B0JpwqGLRHkL3PiNGNcGxnNHdvFAryU';
-    const RANGE = 'Sheet1!B2';
+    const COURAGE_RANGE = 'Sheet1!B2';
 
     let tokenClient;
     let gapiInited = false;
@@ -70,7 +70,7 @@
       tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
         scope: SCOPES,
-        callback: '', // Will be defined during request
+        callback: '', // Set later during request
       });
 
       gisInited = true;
@@ -113,7 +113,7 @@
       try {
         const getResp = await gapi.client.sheets.spreadsheets.values.get({
           spreadsheetId: SHEET_ID,
-          range: RANGE,
+          range: COURAGE_RANGE,
         });
 
         const currentValue = parseInt(getResp.result.values?.[0]?.[0] ?? '1', 10);
@@ -127,7 +127,7 @@
 
         await gapi.client.sheets.spreadsheets.values.update({
           spreadsheetId: SHEET_ID,
-          range: RANGE,
+          range: COURAGE_RANGE,
           valueInputOption: 'USER_ENTERED',
           resource: { values: [[newValue]] },
         });
@@ -140,50 +140,58 @@
       }
     }
 
- async function loadSheetData() {
-  if (!domReady) {
-    setTimeout(loadSheetData, 100);
-    return;
-  }
+    async function loadSheetData() {
+      if (!domReady) {
+        setTimeout(loadSheetData, 100);
+        return;
+      }
 
-  try {
-    const response = await gapi.client.sheets.spreadsheets.values.get({
-      spreadsheetId: SHEET_ID,
-      range: 'Sheet1!A2:B6'
-    });
+      try {
+        const response = await gapi.client.sheets.spreadsheets.values.get({
+          spreadsheetId: SHEET_ID,
+          range: 'Sheet1!A2:B6'
+        });
 
-    console.log("✅ Google Sheets API response:", response);
+        console.log("✅ Google Sheets API response:", response);
 
-    const rows = response.result.values;
-    if (!rows || !Array.isArray(rows)) {
-      throw new Error("No data returned from sheet.");
+        const rows = response.result.values;
+        if (!rows || !Array.isArray(rows)) {
+          throw new Error("No data returned from sheet.");
+        }
+
+        const valueMap = {};
+        rows.forEach(row => {
+          const key = row[0];
+          const val = row[1];
+          valueMap[key] = val;
+        });
+
+        console.log("✅ Parsed valueMap:", valueMap);
+
+        const updateText = (id, value) => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.textContent = value ?? '—';
+          } else {
+            console.warn(`⚠️ Element with id "${id}" not found`);
+          }
+        };
+
+        updateText("sheetValue", valueMap["Courage"]);
+        updateText("renownValue", valueMap["Renown"]);
+        updateText("woundsValue", valueMap["Wounds"]);
+        updateText("experienceValue", valueMap["Experience"]);
+        updateText("aggressionValue", valueMap["Aggression"]);
+
+      } catch (error) {
+        console.error("❌ Error fetching sheet data:", error);
+        document.getElementById("sheetValue").innerText = "Error";
+        document.getElementById("renownValue").innerText = "Error";
+        document.getElementById("woundsValue").innerText = "Error";
+        document.getElementById("experienceValue").innerText = "Error";
+        document.getElementById("aggressionValue").innerText = "Error";
+      }
     }
-
-    const valueMap = {};
-    rows.forEach(row => {
-      const key = row[0];
-      const val = row[1];
-      valueMap[key] = val;
-    });
-
-    console.log("✅ Parsed valueMap:", valueMap);
-
-    // Update DOM elements (make sure these IDs exist!)
-    document.getElementById("sheetValue").innerText = valueMap["Courage"] ?? '—';
-    document.getElementById("renownValue").innerText = valueMap["Renown"] ?? '—';
-    document.getElementById("woundsValue").innerText = valueMap["Wounds"] ?? '—';
-    document.getElementById("experienceValue").innerText = valueMap["Experience"] ?? '—';
-    document.getElementById("aggressionValue").innerText = valueMap["Aggression"] ?? '—';
-
-  } catch (error) {
-    console.error("❌ Error fetching sheet data:", error);
-    document.getElementById("sheetValue").innerText = "Error";
-    document.getElementById("renownValue").innerText = "Error";
-    document.getElementById("woundsValue").innerText = "Error";
-    document.getElementById("experienceValue").innerText = "Error";
-    document.getElementById("aggressionValue").innerText = "Error";
-  }
-}   
   </script>
 </body>
 </html>
