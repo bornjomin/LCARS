@@ -195,3 +195,20 @@ async function loadSheetData() {
 
 // Expose to HTML inline onclick handlers
 window.changeValue = changeValue;
+
+//Handle changing views on index.html
+document.addEventListener("DOMContentLoaded", function() {
+      const pages = document.querySelectorAll(".page-container");
+      const links = document.querySelectorAll(".nav-link");
+
+      links.forEach(link => {
+        link.addEventListener("click", function(e) {
+          e.preventDefault();
+          const target = this.getAttribute("data-target");
+          if (!target) return;
+
+          pages.forEach(p => p.style.display = (p.id === 'page-' + target) ? 'block' : 'none');
+          window.scrollTo(0,0);
+        });
+      });
+    });
