@@ -39,8 +39,8 @@ fetch('https://cors-anywhere.herokuapp.com/https://docs.google.com/spreadsheets/
         document.getElementById("renownValue").innerText = renownValue;
         document.getElementById("woundsValue").innerText = woundsValue;
         document.getElementById("experienceValue").innerText = experienceValue;
-        /*document.getElementById("aggressionValue").innerText = aggressionValue;
-        document.getElementById("iniativeValue").innerText = initiativeValue;
+        document.getElementById("aggressionValue").innerText = aggressionValue;
+        /*document.getElementById("iniativeValue").innerText = initiativeValue;
         document.getElementById("disciplineValue").innerText = disciplineValue;
         document.getElementById("disciplineValue").innerText = opennessValue;
         document.getElementById("skillValue").innerText = skillValue;*/
