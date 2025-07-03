@@ -55,8 +55,8 @@ fetch('https://cors-anywhere.herokuapp.com/https://docs.google.com/spreadsheets/
 
 //Experimental Google Sheets Call
 
- const CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com';  // Replace with your actual client ID
-  const API_KEY = 'YOUR_API_KEY';  // Replace with your actual API key
+ const CLIENT_ID = '864033286840-qjpbbdnj3ujilcfc6dfl3qpu553caldr.apps.googleusercontent.com';  // Replace with your actual client ID
+  const API_KEY = 'AIzaSyCs6niQggMQJSQJC1RxyLiHFEnCu4W-BpQ';  // Replace with your actual API key
   const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
   const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
   const SHEET_ID = '1cq8a8QDSOBE4B0JpwqGLRHkL3PiNGNcGxnNHdvFAryU';
