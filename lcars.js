@@ -13,30 +13,137 @@ function topFunction() {
   document.documentElement.scrollTop = 0;
 }
 
-//Courage Points Calc
-// Fetch the CSV file and process it
-fetch('PointsData.csv')
-  .then(response => response.text())  // Get the raw CSV text
-  .then(data => {
-    // Split the CSV into rows
-    const rows = data.split('\n');
-    
-    // Parse the rows, splitting by comma and removing any empty rows
-    const parsedData = rows.map(row => row.split(',')).filter(row => row.length > 1);
-    
-    // Loop through the rows to find the "Courage" entry
-    parsedData.forEach((row, index) => {
-      if (row[0].trim() === 'Courage' && index === 1) {  // Second row, first column
-        // Get the value (second column, index 1)
-        const courageValue = row[1].trim();
+
+	fetch('https://cors-anywhere.herokuapp.com/https://docs.google.com/spreadsheets/d/1cq8a8QDSOBE4B0JpwqGLRHkL3PiNGNcGxnNHdvFAryU/gviz/tq?tqx=out:json&sheet=sheet1')
+    .then(response => response.text())
+    .then(data => {
+        // Clean Google Sheets API response to get the JSON part
+        const jsonData = JSON.parse(data.substring(47).slice(0, -2)); 
         
-        // Update the HTML element with the retrieved value
-        document.getElementById('sheetValue').textContent = courageValue;
-      }
+        // Log the parsed JSON data to inspect its structure
+        console.log("Parsed JSON data:", jsonData);
+        
+        // Access values from cells B2, B3, B4, and B5
+        const courageValue = jsonData.table.rows[0].c[1].v;  // B2
+        const renownValue = jsonData.table.rows[1].c[1].v;  // B3
+        const woundsValue = jsonData.table.rows[2].c[1].v;  // B4
+        const experienceValue = jsonData.table.rows[3].c[1].v;  // B5
+        
+        // Update the HTML elements with the retrieved values
+        document.getElementById("sheetValue").innerText = courageValue;
+        document.getElementById("renownValue").innerText = renownValue;
+        document.getElementById("woundsValue").innerText = woundsValue;
+        document.getElementById("experienceValue").innerText = experienceValue;
+    })
+    .catch(error => {
+        console.error("Error loading sheet data:", error);
+        document.getElementById("sheetValue").innerText = "Error";
+        document.getElementById("renownValue").innerText = "Error";
+        document.getElementById("woundsValue").innerText = "Error";
+        document.getElementById("experienceValue").innerText = "Error";
     });
-  })
-  .catch(error => {
-    console.error('Error loading or parsing the CSV file:', error);
-    // Handle error case, if needed
-    document.getElementById('sheetValue').textContent = 'Error loading data';
-  });
+	
+	
+	//EXPERIMENTAL GOOGLE API CALL TO UPDATE DATA
+	
+ let isAuthenticated = false;
+    let gapiLoaded = false;
+
+    // Initialize the Google API Client
+    function initApi() {
+      gapi.load('client:auth2', () => {
+        gapi.auth2.init({
+          client_id: 'YOUR_CLIENT_ID.apps.googleusercontent.com' // Replace with your client ID
+        }).then(() => {
+          gapiLoaded = true;
+          if (isAuthenticated) {
+            document.getElementById("status").textContent = "Ready to modify spreadsheet!";
+          }
+        });
+      });
+    }
+
+    // Authenticate the user
+    function authenticate() {
+      gapi.auth2.getAuthInstance().signIn().then(() => {
+        isAuthenticated = true;
+        document.getElementById("status").textContent = "Authenticated! Ready to update value.";
+      }).catch(error => {
+        console.error("Error during authentication", error);
+        document.getElementById("status").textContent = "Authentication failed!";
+      });
+    }
+
+    // Function to increase or decrease the cell B2 value
+    function changeValue(action) {
+      if (!gapiLoaded) {
+        initApi();
+      }
+
+      if (!isAuthenticated) {
+        authenticate();
+      }
+
+      // Prepare to update the sheet
+      const sheetId = "1cq8a8QDSOBE4B0JpwqGLRHkL3PiNGNcGxnNHdvFAryU";  // Your sheet ID
+      const range = "Sheet1!B2";  // Cell B2
+
+      // Fetch current value of B2
+      gapi.client.sheets.spreadsheets.values.get({
+        spreadsheetId: sheetId,
+        range: range
+      }).then(response => {
+        const currentValue = parseInt(response.result.values[0][0], 10) || 1;  // Default to 1 if value is not valid
+
+        // Determine new value
+        let newValue = currentValue;
+        if (action === 'increase') {
+          newValue = currentValue < 3 ? currentValue + 1 : 3; // Cap the value at 3
+        } else if (action === 'decrease') {
+          newValue = currentValue > 1 ? currentValue - 1 : 1; // Cap the value at 1
+        }
+
+        // Update cell B2 with the new value
+        const updateRequest = {
+          spreadsheetId: sheetId,
+          range: range,
+          valueInputOption: "USER_ENTERED",
+          resource: {
+            values: [
+              [newValue]
+            ]
+          }
+        };
+
+        // Make the API request to update the value
+        gapi.client.sheets.spreadsheets.values.update(updateRequest)
+          .then(() => {
+            document.getElementById("status").textContent = `Cell B2 updated to ${newValue}`;
+          }).catch(error => {
+            console.error("Error updating the cell", error);
+            document.getElementById("status").textContent = "Failed to update the value.";
+          });
+      }).catch(error => {
+        console.error("Error fetching the cell value", error);
+        document.getElementById("status").textContent = "Failed to fetch the current value.";
+      });
+    }
+
+    // Load the Google API client
+    gapi.load("client", () => {
+      gapi.client.init({
+        apiKey: 'YOUR_API_KEY', // Add your API Key here
+        clientId: 'YOUR_CLIENT_ID.apps.googleusercontent.com', // Add your client ID
+        discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
+        scope: 'https://www.googleapis.com/auth/spreadsheets',
+      }).then(() => {
+        gapiLoaded = true;
+      }).catch(error => {
+        console.error("Error loading Google API", error);
+      });
+    });
+
+
+
+
+
