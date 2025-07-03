@@ -54,9 +54,8 @@ fetch('https://cors-anywhere.herokuapp.com/https://docs.google.com/spreadsheets/
        });
 
 //Experimental Google Sheets Call
-
- const CLIENT_ID = '864033286840-qjpbbdnj3ujilcfc6dfl3qpu553caldr.apps.googleusercontent.com';  // Replace with your actual client ID
-  const API_KEY = 'AIzaSyCs6niQggMQJSQJC1RxyLiHFEnCu4W-BpQ';  // Replace with your actual API key
+  const CLIENT_ID = '864033286840-qjpbbdnj3ujilcfc6dfl3qpu553caldr.apps.googleusercontent.com'; // Replace with your actual client ID
+  const API_KEY = 'AIzaSyCs6niQggMQJSQJC1RxyLiHFEnCu4W-BpQ'; // Replace with your actual API key
   const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
   const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
   const SHEET_ID = '1cq8a8QDSOBE4B0JpwqGLRHkL3PiNGNcGxnNHdvFAryU';
@@ -66,12 +65,12 @@ fetch('https://cors-anywhere.herokuapp.com/https://docs.google.com/spreadsheets/
   let gapiInited = false;
   let gisInited = false;
 
-  document.addEventListener('DOMContentLoaded', () => {
-    // Load GAPI
+  // Called when gapi.js loads
+  function onGapiLoad() {
     gapi.load('client', initializeGapiClient);
-  });
+  }
 
-  // GAPI client init
+  // Initialize GAPI client
   async function initializeGapiClient() {
     await gapi.client.init({
       apiKey: API_KEY,
@@ -81,39 +80,43 @@ fetch('https://cors-anywhere.herokuapp.com/https://docs.google.com/spreadsheets/
     maybeEnableButtons();
   }
 
-  // GIS token client init
+  // Called when the page finishes loading
   window.onload = () => {
+    // Initialize the token client for GIS OAuth 2.0
     tokenClient = google.accounts.oauth2.initTokenClient({
       client_id: CLIENT_ID,
       scope: SCOPES,
-      callback: '', // will be set during request
+      callback: '', // Will be set during token request
     });
     gisInited = true;
     maybeEnableButtons();
   };
 
+  // Enable buttons when both APIs are initialized
   function maybeEnableButtons() {
     if (gapiInited && gisInited) {
-      document.querySelectorAll('nav a').forEach(btn => btn.disabled = false);
-      document.getElementById("status").textContent = "Ready!";
+      document.querySelectorAll('nav a').forEach(btn => btn.removeAttribute('disabled'));
+      document.getElementById("status").textContent = "Ready to update spreadsheet!";
     }
   }
 
+  // Handles increase/decrease requests
   function changeValue(action) {
-    tokenClient.callback = async (resp) => {
-      if (resp.error !== undefined) {
-        console.error(resp);
-        document.getElementById("status").textContent = "Authentication error.";
+    tokenClient.callback = async (response) => {
+      if (response.error !== undefined) {
+        console.error('Token error:', response);
+        document.getElementById("status").textContent = "Authentication failed.";
         return;
       }
 
       try {
-        const response = await gapi.client.sheets.spreadsheets.values.get({
+        // Read current value
+        const getResponse = await gapi.client.sheets.spreadsheets.values.get({
           spreadsheetId: SHEET_ID,
-          range: RANGE
+          range: RANGE,
         });
 
-        const currentValue = parseInt(response.result.values?.[0]?.[0] ?? '1', 10);
+        const currentValue = parseInt(getResponse.result.values?.[0]?.[0] ?? '1', 10);
         let newValue = currentValue;
 
         if (action === 'increase') {
@@ -122,6 +125,7 @@ fetch('https://cors-anywhere.herokuapp.com/https://docs.google.com/spreadsheets/
           newValue = Math.max(currentValue - 1, 1);
         }
 
+        // Write new value
         await gapi.client.sheets.spreadsheets.values.update({
           spreadsheetId: SHEET_ID,
           range: RANGE,
@@ -133,12 +137,12 @@ fetch('https://cors-anywhere.herokuapp.com/https://docs.google.com/spreadsheets/
 
         document.getElementById("status").textContent = `Cell B2 updated to ${newValue}`;
       } catch (err) {
-        console.error("Error updating the cell", err);
-        document.getElementById("status").textContent = "Update failed.";
+        console.error('Error updating value:', err);
+        document.getElementById("status").textContent = "Failed to update value.";
       }
     };
 
-    // Request access token (will prompt user if not previously authorized)
+    // Prompt for token if needed
     tokenClient.requestAccessToken({ prompt: 'consent' });
   }
 
