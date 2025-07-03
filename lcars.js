@@ -50,7 +50,7 @@ let isAuthenticated = false;
     // Initialize the Google API Client
     function initApi() {
       gapi.load('client:auth2', () => {
-        gapi.auth2.GetAuthInstance({
+        google.accounts.oauth2.GetAuthInstance({
           client_id: '864033286840-qjpbbdnj3ujilcfc6dfl3qpu553caldr.apps.googleusercontent.com' // Replace with your client ID
         }).then(() => {
           gapiLoaded = true;
@@ -63,7 +63,7 @@ let isAuthenticated = false;
 
     // Authenticate the user
     function authenticate() {
-      gapi.auth2.getAuthInstance().signIn().then(() => {
+      google.accounts.oauth2.getAuthInstance().signIn().then(() => {
         isAuthenticated = true;
         document.getElementById("status").textContent = "Authenticated! Ready to update value.";
       }).catch(error => {
