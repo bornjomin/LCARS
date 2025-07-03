@@ -15,7 +15,7 @@ function topFunction() {
 
 //Courage Points Calc
 // Fetch the CSV file and process it
-fetch('PointsData.csv')
+/*fetch('PointsData.csv')
   .then(response => response.text())  // Get the raw CSV text
   .then(data => {
     // Split the CSV into rows
@@ -39,4 +39,34 @@ fetch('PointsData.csv')
     console.error('Error loading or parsing the CSV file:', error);
     // Handle error case, if needed
     document.getElementById('sheetValue').textContent = 'Error loading data';
-  });
+  });*/
+
+//Calculate Status Elements
+fetch('https://cors-anywhere.herokuapp.com/https://docs.google.com/spreadsheets/d/1cq8a8QDSOBE4B0JpwqGLRHkL3PiNGNcGxnNHdvFAryU/gviz/tq?tqx=out:json&sheet=sheet1')
+    .then(response => response.text())
+    .then(data => {
+        // Clean Google Sheets API response to get the JSON part
+        const jsonData = JSON.parse(data.substring(47).slice(0, -2)); 
+        
+        // Log the parsed JSON data to inspect its structure
+        console.log("Parsed JSON data:", jsonData);
+        
+        // Access values from cells B2, B3, B4, and B5
+        const courageValue = jsonData.table.rows[0].c[1].v;  // B2
+        const renownValue = jsonData.table.rows[1].c[1].v;  // B3
+        const woundsValue = jsonData.table.rows[2].c[1].v;  // B4
+        const experienceValue = jsonData.table.rows[3].c[1].v;  // B5
+        
+        // Update the HTML elements with the retrieved values
+        document.getElementById("sheetValue").innerText = courageValue;
+        document.getElementById("renownValue").innerText = renownValue;
+        document.getElementById("woundsValue").innerText = woundsValue;
+        document.getElementById("experienceValue").innerText = experienceValue;
+    })
+    .catch(error => {
+        console.error("Error loading sheet data:", error);
+        document.getElementById("sheetValue").innerText = "Error";
+        document.getElementById("renownValue").innerText = "Error";
+        document.getElementById("woundsValue").innerText = "Error";
+        document.getElementById("experienceValue").innerText = "Error";
+       });
