@@ -145,7 +145,4 @@ function topFunction() {
         document.getElementById("aggressionValue").innerText = "Error";
       }
     }
-  </script>
-</body>
-</html>
     
