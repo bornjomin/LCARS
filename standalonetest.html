@@ -70,45 +70,54 @@
       tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
         scope: SCOPES,
-        callback: '', // Set later during request
+        callback: '', // Set dynamically later
       });
 
       gisInited = true;
       maybeEnableButtons();
-
-      tokenClient.requestAccessToken({
-        prompt: '',
-        callback: () => {
-          loadSheetData();
-        }
-      });
     };
 
     function maybeEnableButtons() {
-  if (gapiInited && gisInited && domReady) {
-    const statusEl = document.getElementById("status");
-    if (statusEl) {
-      statusEl.textContent = "Ready!";
-    }
-
-    document.querySelectorAll('nav a').forEach(btn => btn.removeAttribute('disabled'));
-
-    // Only load data once (first time everything is ready)
-    if (!gapi.client.getToken()) {
-      tokenClient.callback = (resp) => {
-        if (resp.error) {
-          console.error("❌ Token error:", resp);
-          document.getElementById("status").textContent = "Authentication failed.";
-          return;
+      if (gapiInited && gisInited && domReady) {
+        const statusEl = document.getElementById("status");
+        if (statusEl) {
+          statusEl.textContent = "Ready!";
         }
-        loadSheetData(); // <-- ✅ This will run only once after successful auth
-      };
-      tokenClient.requestAccessToken({ prompt: '' });
-    } else {
-      loadSheetData(); // already signed in
+
+        document.querySelectorAll('nav a').forEach(btn => btn.removeAttribute('disabled'));
+
+        // Authenticate and load data only once
+        if (!gapi.client.getToken()) {
+          tokenClient.callback = (resp) => {
+            if (resp.error) {
+              console.error("❌ Token error:", resp);
+              document.getElementById("status").textContent = "Authentication failed.";
+              return;
+            }
+            loadSheetData();
+          };
+          tokenClient.requestAccessToken({ prompt: '' });
+        } else {
+          loadSheetData();
+        }
+      }
     }
-  }
-}
+
+    async function changeValue(action) {
+      if (gapi.client.getToken()) {
+        await runUpdate(action);
+      } else {
+        tokenClient.callback = async (resp) => {
+          if (resp.error) {
+            console.error("❌ Token error:", resp);
+            document.getElementById("status").textContent = "Authentication failed.";
+            return;
+          }
+          await runUpdate(action);
+        };
+        tokenClient.requestAccessToken({ prompt: '' });
+      }
+    }
 
     async function runUpdate(action) {
       try {
@@ -134,7 +143,7 @@
         });
 
         document.getElementById("status").textContent = `Cell B2 updated to ${newValue}`;
-        loadSheetData(); // Refresh values after update
+        loadSheetData(); // Refresh display
       } catch (err) {
         console.error("Error updating sheet:", err);
         document.getElementById("status").textContent = "Failed to update.";
@@ -186,14 +195,18 @@
 
       } catch (error) {
         console.error("❌ Error fetching sheet data:", error);
-        document.getElementById("sheetValue").innerText = "Error";
-        document.getElementById("renownValue").innerText = "Error";
-        document.getElementById("woundsValue").innerText = "Error";
-        document.getElementById("experienceValue").innerText = "Error";
-        document.getElementById("aggressionValue").innerText = "Error";
+        const ids = [
+          "sheetValue", "renownValue", "woundsValue", "experienceValue", "aggressionValue"
+        ];
+        ids.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = "Error";
+        });
       }
     }
-  window.changeValue = changeValue;
+
+    // Expose to HTML inline onclick handlers
+    window.changeValue = changeValue;
   </script>
 </body>
 </html>
