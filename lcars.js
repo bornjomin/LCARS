@@ -46,18 +46,11 @@ function topFunction() {
       tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
         scope: SCOPES,
-        callback: '', // Set later during request
+        callback: '', // Set dynamically later
       });
 
       gisInited = true;
       maybeEnableButtons();
-
-      tokenClient.requestAccessToken({
-        prompt: '',
-        callback: () => {
-          loadSheetData();
-        }
-      });
     };
 
     function maybeEnableButtons() {
@@ -66,20 +59,37 @@ function topFunction() {
         if (statusEl) {
           statusEl.textContent = "Ready!";
         }
+
         document.querySelectorAll('nav a').forEach(btn => btn.removeAttribute('disabled'));
+
+        // Authenticate and load data only once
+        if (!gapi.client.getToken()) {
+          tokenClient.callback = (resp) => {
+            if (resp.error) {
+              console.error("❌ Token error:", resp);
+              document.getElementById("status").textContent = "Authentication failed.";
+              return;
+            }
+            loadSheetData();
+          };
+          tokenClient.requestAccessToken({ prompt: '' });
+        } else {
+          loadSheetData();
+        }
       }
     }
 
-    function changeValue(action) {
+    async function changeValue(action) {
       if (gapi.client.getToken()) {
-        runUpdate(action);
+        await runUpdate(action);
       } else {
-        tokenClient.callback = (resp) => {
+        tokenClient.callback = async (resp) => {
           if (resp.error) {
+            console.error("❌ Token error:", resp);
             document.getElementById("status").textContent = "Authentication failed.";
             return;
           }
-          runUpdate(action);
+          await runUpdate(action);
         };
         tokenClient.requestAccessToken({ prompt: '' });
       }
@@ -109,7 +119,7 @@ function topFunction() {
         });
 
         document.getElementById("status").textContent = `Cell B2 updated to ${newValue}`;
-        loadSheetData(); // Refresh values after update
+        loadSheetData(); // Refresh display
       } catch (err) {
         console.error("Error updating sheet:", err);
         document.getElementById("status").textContent = "Failed to update.";
@@ -161,10 +171,15 @@ function topFunction() {
 
       } catch (error) {
         console.error("❌ Error fetching sheet data:", error);
-        document.getElementById("sheetValue").innerText = "Error";
-        document.getElementById("renownValue").innerText = "Error";
-        document.getElementById("woundsValue").innerText = "Error";
-        document.getElementById("experienceValue").innerText = "Error";
-        document.getElementById("aggressionValue").innerText = "Error";
+        const ids = [
+          "sheetValue", "renownValue", "woundsValue", "experienceValue", "aggressionValue"
+        ];
+        ids.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = "Error";
+        });
       }
     }
+
+    // Expose to HTML inline onclick handlers
+    window.changeValue = changeValue;
