@@ -54,69 +54,81 @@ fetch('https://cors-anywhere.herokuapp.com/https://docs.google.com/spreadsheets/
        });
 
 //Experimental Google Sheets Call
-  const CLIENT_ID = '864033286840-qjpbbdnj3ujilcfc6dfl3qpu553caldr.apps.googleusercontent.com'; // Replace with your actual client ID
-  const API_KEY = 'AIzaSyCs6niQggMQJSQJC1RxyLiHFEnCu4W-BpQ'; // Replace with your actual API key
-  const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
-  const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
-  const SHEET_ID = '1cq8a8QDSOBE4B0JpwqGLRHkL3PiNGNcGxnNHdvFAryU';
-  const RANGE = 'Sheet1!B2';
+    const CLIENT_ID = '864033286840-qjpbbdnj3ujilcfc6dfl3qpu553caldr.apps.googleusercontent.com'; // ✅ Replace this
+    const API_KEY = 'AIzaSyCs6niQggMQJSQJC1RxyLiHFEnCu4W-BpQ'; // ✅ Replace this
+    const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
+    const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
+    const SHEET_ID = '1cq8a8QDSOBE4B0JpwqGLRHkL3PiNGNcGxnNHdvFAryU';
+    const RANGE = 'Sheet1!B2';
 
-  let tokenClient;
-  let gapiInited = false;
-  let gisInited = false;
+    let tokenClient;
+    let gapiInited = false;
+    let gisInited = false;
 
-  // Called when gapi.js loads
-  function onGapiLoad() {
-    gapi.load('client', initializeGapiClient);
-  }
-
-  // Initialize GAPI client
-  async function initializeGapiClient() {
-    await gapi.client.init({
-      apiKey: API_KEY,
-      discoveryDocs: [DISCOVERY_DOC],
-    });
-    gapiInited = true;
-    maybeEnableButtons();
-  }
-
-  // Called when the page finishes loading
-  window.onload = () => {
-    // Initialize the token client for GIS OAuth 2.0
-    tokenClient = google.accounts.oauth2.initTokenClient({
-      client_id: CLIENT_ID,
-      scope: SCOPES,
-      callback: '', // Will be set during token request
-    });
-    gisInited = true;
-    maybeEnableButtons();
-  };
-
-  // Enable buttons when both APIs are initialized
-  function maybeEnableButtons() {
-    if (gapiInited && gisInited) {
-      document.querySelectorAll('nav a').forEach(btn => btn.removeAttribute('disabled'));
-      document.getElementById("status").textContent = "Ready to update spreadsheet!";
+    // Called when the GAPI script loads
+    function onGapiLoad() {
+      gapi.load('client', initializeGapiClient);
     }
-  }
 
-  // Handles increase/decrease requests
-  function changeValue(action) {
-    tokenClient.callback = async (response) => {
-      if (response.error !== undefined) {
-        console.error('Token error:', response);
-        document.getElementById("status").textContent = "Authentication failed.";
-        return;
+    // Initialize the Google API client
+    async function initializeGapiClient() {
+      await gapi.client.init({
+        apiKey: API_KEY,
+        discoveryDocs: [DISCOVERY_DOC],
+      });
+      gapiInited = true;
+      maybeEnableButtons();
+    }
+
+    // Called when the page fully loads
+    window.onload = () => {
+      tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID,
+        scope: SCOPES,
+        callback: '', // Set during actual request
+      });
+
+      gisInited = true;
+      maybeEnableButtons();
+
+      // Attempt silent token request (pre-auth)
+      tokenClient.requestAccessToken({ prompt: '' });
+    };
+
+    function maybeEnableButtons() {
+      if (gapiInited && gisInited) {
+        document.querySelectorAll('nav a').forEach(btn => btn.removeAttribute('disabled'));
+        document.getElementById("status").textContent = "Ready!";
       }
+    }
 
+    // Handles increase/decrease clicks
+    function changeValue(action) {
+      // Reuse token if already present
+      if (gapi.client.getToken()) {
+        runUpdate(action);
+      } else {
+        tokenClient.callback = (resp) => {
+          if (resp.error) {
+            console.error("Token error", resp);
+            document.getElementById("status").textContent = "Authentication failed.";
+            return;
+          }
+          runUpdate(action);
+        };
+        tokenClient.requestAccessToken({ prompt: '' }); // Silent if possible
+      }
+    }
+
+    // Reads and updates the cell value
+    async function runUpdate(action) {
       try {
-        // Read current value
-        const getResponse = await gapi.client.sheets.spreadsheets.values.get({
+        const response = await gapi.client.sheets.spreadsheets.values.get({
           spreadsheetId: SHEET_ID,
           range: RANGE,
         });
 
-        const currentValue = parseInt(getResponse.result.values?.[0]?.[0] ?? '1', 10);
+        const currentValue = parseInt(response.result.values?.[0]?.[0] ?? '1', 10);
         let newValue = currentValue;
 
         if (action === 'increase') {
@@ -125,25 +137,16 @@ fetch('https://cors-anywhere.herokuapp.com/https://docs.google.com/spreadsheets/
           newValue = Math.max(currentValue - 1, 1);
         }
 
-        // Write new value
         await gapi.client.sheets.spreadsheets.values.update({
           spreadsheetId: SHEET_ID,
           range: RANGE,
           valueInputOption: 'USER_ENTERED',
-          resource: {
-            values: [[newValue]],
-          }
+          resource: { values: [[newValue]] },
         });
 
         document.getElementById("status").textContent = `Cell B2 updated to ${newValue}`;
       } catch (err) {
-        console.error('Error updating value:', err);
-        document.getElementById("status").textContent = "Failed to update value.";
+        console.error("Error updating sheet:", err);
+        document.getElementById("status").textContent = "Failed to update sheet.";
       }
-    };
-
-    // Prompt for token if needed
-    //tokenClient.requestAccessToken({ prompt: 'consent' });
-    tokenClient.requestAccessToken(); // No prompt forces silent refresh if token is still valid
-  }
-
+    }
