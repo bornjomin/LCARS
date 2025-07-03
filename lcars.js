@@ -197,21 +197,13 @@ async function loadSheetData() {
 window.changeValue = changeValue;
 
 //Toggle between main and attributes views
-document.addEventListener("DOMContentLoaded", function() {
-			const attrLink = document.getElementById("load-attributes");
-			const attrContent = document.getElementById("attributes-content");
-			const mainWrapper = document.querySelector(".wrap-everything");
+// Intercept click on "Attributes" link
+	document.getElementById('attributes-link').addEventListener('click', function(event) {
+		event.preventDefault(); // Prevent navigation
 
-			if (attrLink && attrContent && mainWrapper) {
-				attrLink.addEventListener("click", function(e) {
-					e.preventDefault();
-					mainWrapper.style.display = "none";
-					attrContent.style.display = "block";
-				});
-			}
-		});
+		// Hide main content
+		document.getElementById('main-content').style.display = 'none';
 
-		function restoreMain() {
-			document.querySelector(".wrap-everything").style.display = "block";
-			document.getElementById("attributes-content").style.display = "none";
-		}
+		// Show Attributes content
+		document.getElementById('attributes-content').style.display = 'block';
+	});
