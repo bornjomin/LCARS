@@ -119,7 +119,10 @@ function topFunction() {
         });
 
         document.getElementById("status").textContent = `Cell B2 updated to ${newValue}`;
-        loadSheetData(); // Refresh display
+        // ✅ Add a small delay before reloading sheet data
+      setTimeout(() => {
+      loadSheetData();
+    }, 300);
       } catch (err) {
         console.error("Error updating sheet:", err);
         document.getElementById("status").textContent = "Failed to update.";
