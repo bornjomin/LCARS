@@ -143,6 +143,7 @@ fetch('https://cors-anywhere.herokuapp.com/https://docs.google.com/spreadsheets/
     };
 
     // Prompt for token if needed
-    tokenClient.requestAccessToken({ prompt: 'consent' });
+    //tokenClient.requestAccessToken({ prompt: 'consent' });
+    tokenClient.requestAccessToken(); // No prompt forces silent refresh if token is still valid
   }
 
