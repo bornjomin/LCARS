@@ -50,7 +50,7 @@ let isAuthenticated = false;
     // Initialize the Google API Client
     function initApi() {
       gapi.load('client:auth2', () => {
-        gapi.auth2.init({
+        gapi.auth2.GetAuthInstance({
           client_id: '864033286840-qjpbbdnj3ujilcfc6dfl3qpu553caldr.apps.googleusercontent.com' // Replace with your client ID
         }).then(() => {
           gapiLoaded = true;
