@@ -96,38 +96,37 @@ function topFunction() {
     }
 
     async function runUpdate(action) {
-      try {
-        const getResp = await gapi.client.sheets.spreadsheets.values.get({
-          spreadsheetId: SHEET_ID,
-          range: COURAGE_RANGE,
-        });
+  try {
+    const getResp = await gapi.client.sheets.spreadsheets.values.get({
+      spreadsheetId: SHEET_ID,
+      range: COURAGE_RANGE,
+    });
 
-        const currentValue = parseInt(getResp.result.values?.[0]?.[0] ?? '1', 10);
-        let newValue = currentValue;
+    const currentValue = parseInt(getResp.result.values?.[0]?.[0] ?? '1', 10);
+    let newValue = currentValue;
 
-        if (action === 'increase') {
-          newValue = Math.min(currentValue + 1, 3);
-        } else if (action === 'decrease') {
-          newValue = Math.max(currentValue - 1, 1);
-        }
-
-        await gapi.client.sheets.spreadsheets.values.update({
-          spreadsheetId: SHEET_ID,
-          range: COURAGE_RANGE,
-          valueInputOption: 'USER_ENTERED',
-          resource: { values: [[newValue]] },
-        });
-
-        document.getElementById("status").textContent = `Cell B2 updated to ${newValue}`;
-        // ✅ Add a small delay before reloading sheet data
-      setTimeout(() => {
-      loadSheetData();
-    }, 300);
-      } catch (err) {
-        console.error("Error updating sheet:", err);
-        document.getElementById("status").textContent = "Failed to update.";
-      }
+    if (action === 'increase') {
+      newValue = Math.min(currentValue + 1, 3);
+    } else if (action === 'decrease') {
+      newValue = Math.max(currentValue - 1, 1);
     }
+
+    await gapi.client.sheets.spreadsheets.values.update({
+      spreadsheetId: SHEET_ID,
+      range: COURAGE_RANGE,
+      valueInputOption: 'USER_ENTERED',
+      resource: { values: [[newValue]] },
+    });
+
+    // ✅ Directly update the Courage element immediately
+    const courageEl = document.getElementById("sheetValue");
+    if (courageEl) {
+      courageEl.textContent = newValue;
+    }
+
+  } catch (err) {
+    console.error("Error updating sheet:", err);
+  }
 
     async function loadSheetData() {
       if (!domReady) {
