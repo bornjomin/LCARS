@@ -38,8 +38,8 @@
   <script src="https://apis.google.com/js/api.js" async defer onload="onGapiLoad()"></script>
 
   <script>
-    const CLIENT_ID = '864033286840-qjpbbdnj3ujilcfc6dfl3qpu553caldr.apps.googleusercontent.com'; // ✅ Replace
-    const API_KEY = 'AIzaSyCs6niQggMQJSQJC1RxyLiHFEnCu4W-BpQ'; // ✅ Replace
+    const CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com'; // ✅ Replace with your actual client ID
+    const API_KEY = 'YOUR_API_KEY'; // ✅ Replace with your actual API key
     const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
     const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
     const SHEET_ID = '1cq8a8QDSOBE4B0JpwqGLRHkL3PiNGNcGxnNHdvFAryU';
@@ -70,7 +70,7 @@
       tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
         scope: SCOPES,
-        callback: '', // Set later
+        callback: '', // Will be defined during request
       });
 
       gisInited = true;
@@ -149,23 +149,24 @@
       try {
         const response = await gapi.client.sheets.spreadsheets.values.get({
           spreadsheetId: SHEET_ID,
-          range: 'Sheet1!B2:B6'
+          range: 'Sheet1!A2:B6'
         });
 
-        const values = response.result.values;
-        console.log("Fetched values:", values); // Helps debug content
+        const rows = response.result.values;
+        console.log("Fetched rows:", rows);
 
-        const courageValue = values?.[0]?.[0] ?? '—';
-        const renownValue = values?.[1]?.[0] ?? '—';
-        const woundsValue = values?.[2]?.[0] ?? '—';
-        const experienceValue = values?.[3]?.[0] ?? '—';
-        const aggressionValue = values?.[4]?.[0] ?? '—';
+        const valueMap = {};
+        rows.forEach(row => {
+          const key = row[0]; // e.g. "Courage"
+          const val = row[1]; // e.g. 2
+          if (key && val !== undefined) valueMap[key] = val;
+        });
 
-        document.getElementById("sheetValue").innerText = courageValue;
-        document.getElementById("renownValue").innerText = renownValue;
-        document.getElementById("woundsValue").innerText = woundsValue;
-        document.getElementById("experienceValue").innerText = experienceValue;
-        document.getElementById("aggressionValue").innerText = aggressionValue;
+        document.getElementById("sheetValue").innerText = valueMap["Courage"] ?? '—';
+        document.getElementById("renownValue").innerText = valueMap["Renown"] ?? '—';
+        document.getElementById("woundsValue").innerText = valueMap["Wounds"] ?? '—';
+        document.getElementById("experienceValue").innerText = valueMap["Experience"] ?? '—';
+        document.getElementById("aggressionValue").innerText = valueMap["Aggression"] ?? '—';
 
       } catch (error) {
         console.error("Error fetching sheet data:", error);
