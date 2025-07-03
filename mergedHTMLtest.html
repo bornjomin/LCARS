@@ -6,10 +6,23 @@
 	<meta name="format-detection" content="telephone=no">
 	<meta name="format-detection" content="date=no">
 	<link rel="stylesheet" type="text/css" href="classic.css">
+	<style>
+		#attributes-content {
+			display: none;
+		}
+	</style>
 </head>
 <body>
-	<!-- MAIN WRAPPER (Default Display) -->
-	<div class="wrap-everything">
+	<!-- Attributes content section (hidden by default) -->
+	<div id="attributes-content">
+		<!-- Paste your Attributes.html content below this line -->
+		<h1 class="font-gold">Attributes</h1>
+		<p class="go-big">This is the placeholder for Attributes.html content.</p>
+		<!-- Paste your Attributes.html content above this line -->
+	</div>
+
+	<!-- Main content wrapper -->
+	<div class="wrap-everything" id="main-content">
 		<section id="column-1">
 			<div class="lcars-frame">
 				<div class="frame-col-1">
@@ -69,26 +82,26 @@
 			<div class="wrap">
 				<div class="left-frame-top">
 					<div class="panel-1"><a href="">Name</a></div>
-					<div class="panel-2"></a></div>
+					<div class="panel-2"></div>
 				</div>
 				<div class="right-frame-top">
 					<div class="banner">Skee Anna Troi &#149; Betazoid</div>
 					<div class="data-cascade-button-group">
-						<div class="data-cascade-wrapper" id="default">
+						<div class="data-cascade-wrapper" id="default"></div>
+						<nav> 
+							<a href="#" id="attributes-link">Attributes</a>
+							<a href="classic-ultra%20-%20Coordination.html">Mission</a>
+							<a href="status.html">Status</a>
+							<a href="classic-ultra - Skills.html">All Skills</a>
+						</nav>
 					</div>
-					<nav> 
-						<a href="#" id="load-attributes">Attributes</a>
-						<a href="classic-ultra%20-%20Coordination.html">Mission</a>
-						<a href="status.html">Status</a>
-						<a href="classic-ultra - Skills.html">All Skills</a>
-					</nav>
-				</div>
-				<div class="bar-panel first-bar-panel">
-					<div class="bar-1"></div>
-					<div class="bar-2"></div>
-					<div class="bar-3"></div>
-					<div class="bar-4"></div>
-					<div class="bar-5"></div>
+					<div class="bar-panel first-bar-panel">
+						<div class="bar-1"></div>
+						<div class="bar-2"></div>
+						<div class="bar-3"></div>
+						<div class="bar-4"></div>
+						<div class="bar-5"></div>
+					</div>
 				</div>
 			</div>
 			<div class="wrap" id="gap">
@@ -116,13 +129,11 @@
 						<div class="bar-10"></div>
 					</div>
 					<main>
-						<!-- Start your content here. -->
 						<h1>Junior Lieutenant</h1>
 						<h2>U.S.S. Beebo&#149;Galaxy Class&#149;Captain Reginald Blubus</h2>
 						<h3 class="font-gold">Ship's Counselor</h3>					
 						<h4>Medical Support mission to Artlines 4</h4>
 						<p class="go-big">6-24-25</p>
-						<!-- End content area. -->
 					</main>
 					<footer>
 						<div class="meta-data">Assigned to away team to greet delegation</div>
@@ -136,30 +147,12 @@
 				</div>
 			</div>
 		</section>
-	</div>
-
-	<!-- DYNAMIC ATTRIBUTES PAGE - INITIALLY HIDDEN -->
-	<div id="attributes-content" style="display: none;">
-		<!-- 
-			⬇️ PASTE YOUR CUSTOM ATTRIBUTES HTML CONTENT BELOW THIS LINE ⬇️ 
-		-->
-
-		<h1 class="font-gold">Attributes</h1>
-		<p>Placeholder content. Replace this with your actual attributes layout.</p>
-
-		<!-- 
-			⬆️ PASTE YOUR CUSTOM ATTRIBUTES HTML CONTENT ABOVE THIS LINE ⬆️ 
-		-->
-		<button onclick="restoreMain()" class="back-button">Back to Main</button>
-	</div>
+	</div> <!-- End .wrap-everything -->
 
 	<audio autoplay>
 		<source src="theme.mp3" type="audio/mpeg">
 	</audio>
-
 	<script type="text/javascript" src="lcars.js"></script>
-
-<div class="headtrim"> </div>
-	<div class="baseboard"> </div>
-</body>
-</html>
+ <div class="headtrim"> </div> <div class="baseboard"> </div> 
+	 </body> </html>
+	
