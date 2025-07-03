@@ -140,43 +140,50 @@
       }
     }
 
-    async function loadSheetData() {
-      if (!domReady) {
-        setTimeout(loadSheetData, 100);
-        return;
-      }
+ async function loadSheetData() {
+  if (!domReady) {
+    setTimeout(loadSheetData, 100);
+    return;
+  }
 
-      try {
-        const response = await gapi.client.sheets.spreadsheets.values.get({
-          spreadsheetId: SHEET_ID,
-          range: 'Sheet1!A2:B6'
-        });
+  try {
+    const response = await gapi.client.sheets.spreadsheets.values.get({
+      spreadsheetId: SHEET_ID,
+      range: 'Sheet1!A2:B6'
+    });
 
-        const rows = response.result.values;
-        console.log("Fetched rows:", rows);
+    console.log("✅ Google Sheets API response:", response);
 
-        const valueMap = {};
-        rows.forEach(row => {
-          const key = row[0]; // e.g. "Courage"
-          const val = row[1]; // e.g. 2
-          if (key && val !== undefined) valueMap[key] = val;
-        });
-
-        document.getElementById("sheetValue").innerText = valueMap["Courage"] ?? '—';
-        document.getElementById("renownValue").innerText = valueMap["Renown"] ?? '—';
-        document.getElementById("woundsValue").innerText = valueMap["Wounds"] ?? '—';
-        document.getElementById("experienceValue").innerText = valueMap["Experience"] ?? '—';
-        document.getElementById("aggressionValue").innerText = valueMap["Aggression"] ?? '—';
-
-      } catch (error) {
-        console.error("Error fetching sheet data:", error);
-        document.getElementById("sheetValue").innerText = "Error";
-        document.getElementById("renownValue").innerText = "Error";
-        document.getElementById("woundsValue").innerText = "Error";
-        document.getElementById("experienceValue").innerText = "Error";
-        document.getElementById("aggressionValue").innerText = "Error";
-      }
+    const rows = response.result.values;
+    if (!rows || !Array.isArray(rows)) {
+      throw new Error("No data returned from sheet.");
     }
+
+    const valueMap = {};
+    rows.forEach(row => {
+      const key = row[0];
+      const val = row[1];
+      valueMap[key] = val;
+    });
+
+    console.log("✅ Parsed valueMap:", valueMap);
+
+    // Update DOM elements (make sure these IDs exist!)
+    document.getElementById("sheetValue").innerText = valueMap["Courage"] ?? '—';
+    document.getElementById("renownValue").innerText = valueMap["Renown"] ?? '—';
+    document.getElementById("woundsValue").innerText = valueMap["Wounds"] ?? '—';
+    document.getElementById("experienceValue").innerText = valueMap["Experience"] ?? '—';
+    document.getElementById("aggressionValue").innerText = valueMap["Aggression"] ?? '—';
+
+  } catch (error) {
+    console.error("❌ Error fetching sheet data:", error);
+    document.getElementById("sheetValue").innerText = "Error";
+    document.getElementById("renownValue").innerText = "Error";
+    document.getElementById("woundsValue").innerText = "Error";
+    document.getElementById("experienceValue").innerText = "Error";
+    document.getElementById("aggressionValue").innerText = "Error";
+  }
+}   
   </script>
 </body>
 </html>
