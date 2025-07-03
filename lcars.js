@@ -28,11 +28,11 @@ fetch('https://cors-anywhere.herokuapp.com/https://docs.google.com/spreadsheets/
         const renownValue = jsonData.table.rows[1].c[1].v;  // B3
         const woundsValue = jsonData.table.rows[2].c[1].v;  // B4
         const experienceValue = jsonData.table.rows[3].c[1].v;  // B5
-        /*const aggressionValue = jsonData.table.rows[4].c[1].v;  // B3
-        const initiativeValue = jsonData.table.rows[6].c[1].v;  // B3
-        const disciplineValue = jsonData.table.rows[5].c[1].v;  // B3
-        const skillValue = jsonData.table.rows[8].c[1].v;  // B3
-        const opennessValue = jsonData.table.rows[7].c[1].v;  // B3*/
+        const aggressionValue = jsonData.table.rows[4].c[1].v;  // B6
+        /*const initiativeValue = jsonData.table.rows[6].c[1].v;  // B8
+        const disciplineValue = jsonData.table.rows[5].c[1].v;  // B7
+        const skillValue = jsonData.table.rows[8].c[1].v;  // B10
+        const opennessValue = jsonData.table.rows[7].c[1].v;  // B9*/
         
         // Update the HTML elements with the retrieved values
         document.getElementById("sheetValue").innerText = courageValue;
