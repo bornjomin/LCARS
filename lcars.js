@@ -243,3 +243,7 @@ window.changeValue = changeValue;
 		event.preventDefault();
 		showSection('skills-content');
 	});
+	
+	document.getElementById('main-link').addEventListener('click', function(event) {
+		event.preventDefault();
+		showSection('main-content');
