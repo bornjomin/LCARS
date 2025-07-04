@@ -2664,3 +2664,9 @@ footer {
    	line-height: 1rem;
    }
 }
+
+#main-content {
+  display: flex; /* Or grid */
+  flex-direction: row;
+  /*gap: 1rem; /* optional */
+}
