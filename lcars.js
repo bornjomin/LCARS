@@ -247,7 +247,7 @@ window.changeValue = changeValue;
 		showSection('main-content');
 	});*/
 
-const sections = ['main-content', 'attributes-content', 'status-content', 'mission-content', 'skills-content'];
+/*const sections = ['main-content', 'attributes-content', 'status-content', 'mission-content', 'skills-content'];
 
 // Helper function to show one section and hide the others
 function showSection(sectionId) {
@@ -290,6 +290,32 @@ document.addEventListener('DOMContentLoaded', function () {
 				}
 			}
 		});
+	}
+});*/
+
+const sections = ['main-content', 'attributes-content', 'status-content', 'mission-content', 'skills-content'];
+
+document.addEventListener('DOMContentLoaded', function () {
+	showSection('main-content'); // Show only main content by default
+});
+
+// Reusable function to toggle sections
+function showSection(sectionId) {
+	sections.forEach(id => {
+		const el = document.getElementById(id);
+		if (el) el.style.display = (id === sectionId) ? 'block' : 'none';
+	});
+}
+
+// Listen for any <a> click with data-section
+document.addEventListener('click', function (event) {
+	const link = event.target.closest('a[data-section]');
+	if (link) {
+		event.preventDefault();
+		const sectionId = link.getAttribute('data-section');
+		if (sections.includes(sectionId)) {
+			showSection(sectionId);
+		}
 	}
 });
 
