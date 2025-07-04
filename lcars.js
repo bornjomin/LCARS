@@ -244,6 +244,5 @@ const sections = ['main-content', 'attributes-content', 'status-content', 'missi
 	});
 	
 	document.getElementById('main-link').addEventListener('click', function(event) {
-		event.preventDefault();
 		showSection('main-content');
 	});
