@@ -109,7 +109,7 @@ async function runUpdate(action) {
     if (action === 'increase') {
       newValue = Math.min(currentValue + 1, 3);
     } else if (action === 'decrease') {
-      newValue = Math.max(currentValue - 1, 1);
+      newValue = Math.max(currentValue - 1, 0);
     }
 
     await gapi.client.sheets.spreadsheets.values.update({
