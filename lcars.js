@@ -224,22 +224,22 @@ const sections = ['main-content', 'attributes-content', 'status-content', 'missi
 
 	// Attach event listeners for each link
 	document.getElementById('attributes-link').addEventListener('click', function(event) {
-		event.preventDefault();
+		//event.preventDefault();
 		showSection('attributes-content');
 	});
 
 	document.getElementById('status-link').addEventListener('click', function(event) {
-		event.preventDefault();
+		//event.preventDefault();
 		showSection('status-content');
 	});
 
 	document.getElementById('mission-link').addEventListener('click', function(event) {
-		event.preventDefault();
+		//event.preventDefault();
 		showSection('mission-content');
 	});
 
 	document.getElementById('skills-link').addEventListener('click', function(event) {
-		event.preventDefault();
+		//event.preventDefault();
 		showSection('skills-content');
 	});
 	
