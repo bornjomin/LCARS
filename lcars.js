@@ -247,3 +247,4 @@ window.changeValue = changeValue;
 	document.getElementById('main-link').addEventListener('click', function(event) {
 		event.preventDefault();
 		showSection('main-content');
+	});
