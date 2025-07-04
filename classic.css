@@ -2670,3 +2670,8 @@ footer {
   flex-direction: row;
   /*gap: 1rem; /* optional */
 }
+
+.wrap-everything {
+	display: flex;
+	flex-direction: row;
+}
