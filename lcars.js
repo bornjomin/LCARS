@@ -293,7 +293,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	}
 });*/
 
-const sections = ['main-content', 'attributes-content', 'status-content', 'mission-content', 'skills-content'];
+const sections = ['main-content', 'attributes-content', 'status-content', 'mission-content', 'skills-content', 'courage-content', 'renown-content', 'wounds-content', 'experience-content', 'fitness-content', 'intellect-content', 'presence-content', 'coordination-content', 'psi-content'];
 
 document.addEventListener('DOMContentLoaded', function () {
 	showSection('main-content'); // Show only main content by default
