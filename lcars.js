@@ -211,6 +211,9 @@ window.changeValue = changeValue;
 //New toggle for additional pages:
 // List of all dynamic sections you want to toggle
 	const sections = ['main-content', 'attributes-content', 'status-content', 'mission-content', 'skills-content'];
+	document.addEventListener('DOMContentLoaded', function () {
+	showSection('main-content'); // Show only main content by default
+	});
 
 	// Helper function to show one section and hide the others
 	function showSection(sectionId) {
