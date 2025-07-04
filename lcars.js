@@ -209,7 +209,7 @@ window.changeValue = changeValue;
 	//});
 
 //New toggle for additional pages:
-const sections = ['main-content', 'attributes-content', 'status-content', 'mission-content', 'skills-content'];
+/*const sections = ['main-content', 'attributes-content', 'status-content', 'mission-content', 'skills-content'];
 	document.addEventListener('DOMContentLoaded', function () {
 	showSection('main-content'); // Show only main content by default
 	});
@@ -245,4 +245,52 @@ const sections = ['main-content', 'attributes-content', 'status-content', 'missi
 	
 	document.getElementById('main-link').addEventListener('click', function(event) {
 		showSection('main-content');
+	});*/
+
+const sections = ['main-content', 'attributes-content', 'status-content', 'mission-content', 'skills-content'];
+
+// Helper function to show one section and hide the others
+function showSection(sectionId) {
+	sections.forEach(id => {
+		const el = document.getElementById(id);
+		if (el) {
+			el.style.display = (id === sectionId) ? 'block' : 'none';
+		}
 	});
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+	// Show only main content by default
+	showSection('main-content');
+
+	// Use event delegation on <nav> (or another container that wraps the section links)
+	const nav = document.querySelector('nav');
+	if (nav) {
+		nav.addEventListener('click', function (event) {
+			if (event.target.tagName === 'A') {
+				event.preventDefault();
+				const id = event.target.id;
+
+				switch (id) {
+					case 'main-link':
+						showSection('main-content');
+						break;
+					case 'attributes-link':
+						showSection('attributes-content');
+						break;
+					case 'status-link':
+						showSection('status-content');
+						break;
+					case 'mission-link':
+						showSection('mission-content');
+						break;
+					case 'skills-link':
+						showSection('skills-content');
+						break;
+				}
+			}
+		});
+	}
+});
+
+ 
